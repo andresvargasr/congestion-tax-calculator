@@ -1,7 +1,5 @@
-package congestion.calculator;
+package com.volvocars.congestiiontaxcalculator.model;
 
-import java.util.*;
-import java.text.*;
 
 public class Car implements Vehicle {
 
