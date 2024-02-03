@@ -6,7 +6,6 @@ via HTTP
 ## Prerequisites
 
 JDK 17 or higher
-Docker and docker compose (for bonus "Tax rules outside the app" section)
 
 ## How to run?
 

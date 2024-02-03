@@ -1,17 +1,22 @@
 package com.volvocars.congestiiontaxcalculator.service;
 
-import java.net.SocketOption;
+import com.volvocars.congestiiontaxcalculator.model.TollFeeRule;
+import com.volvocars.congestiiontaxcalculator.utils.TollFeeLoader;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.volvocars.congestiiontaxcalculator.model.Vehicle;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CongestionTaxCalculator {
 
     private static Map<String, Integer> tollFreeVehicles = new HashMap<>();
+    private static List<TollFeeRule> tollFeeRules = new ArrayList<>();
 
     static {
         tollFreeVehicles.put("Motorbike", 0);
@@ -65,17 +70,41 @@ public class CongestionTaxCalculator {
 
         int hour = date.getHours();
         int minute = date.getMinutes();
+        tollFeeRules = TollFeeLoader.loadTollFeeRules();
+        tollFeeRules.stream().forEach(tollFeeRule -> System.out.println(tollFeeRule));
+        return evaluateTollFeeRuleInMemory(hour, minute);
+    }
 
-        if (hour == 6 && minute >= 0 && minute <= 29) return 8;
-        else if (hour == 6 && minute >= 30 && minute <= 59) return 13;
-        else if (hour == 7 && minute >= 0 && minute <= 59) return 18;
-        else if (hour == 8 && minute >= 0 && minute <= 29) return 13;
-        else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59) return 8;
-        else if (hour == 15 && minute >= 0 && minute <= 29) return 13;
-        else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59) return 18;
-        else if (hour == 17 && minute >= 0 && minute <= 59) return 13;
-        else if (hour == 18 && minute >= 0 && minute <= 29) return 8;
-        else return 0;
+    //TODO this methods will replace evaluateTollFeeRuleInMemory
+    private static int evaluateTollFeeRuleLoaded(int hour, int minute) {
+        Optional<TollFeeRule> foundFee = tollFeeRules.stream().filter(
+            r -> r.getHour() == hour && (r.getMinuteStart() <= minute
+                && r.getMinuteEnd() >= minute)).findFirst();
+        return foundFee.isPresent()? foundFee.get().getFeeValue() : 0;
+    }
+
+    @Deprecated
+    private static int evaluateTollFeeRuleInMemory(int hour, int minute) {
+        if (hour == 6 && minute >= 0 && minute <= 29)
+            return 8;
+        else if (hour == 6 && minute >= 30 && minute <= 59)
+            return 13;
+        else if (hour == 7 && minute >= 0 && minute <= 59)
+            return 18;
+        else if (hour == 8 && minute >= 0 && minute <= 29)
+            return 13;
+        else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59)
+            return 8;
+        else if (hour == 15 && minute >= 0 && minute <= 29)
+            return 13;
+        else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59)
+            return 18;
+        else if (hour == 17 && minute >= 0 && minute <= 59)
+            return 13;
+        else if (hour == 18 && minute >= 0 && minute <= 29)
+            return 8;
+        else
+            return 0;
     }
 
     private Boolean isTollFreeDate(Date date)
