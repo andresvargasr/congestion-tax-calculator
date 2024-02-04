@@ -8,7 +8,7 @@ import java.util.List;
 import com.volvocars.congestiiontaxcalculator.model.TollFeeRule;
 
 public class TollFeeLoader {
-  private static final String CSV_FILE_PATH = "classpath:tollfees.csv";
+  private static final String CSV_FILE_PATH = "src/main/resources/tollfees.csv";
 
   public static List<TollFeeRule> loadTollFeeRules() {
     List<TollFeeRule> rules = new ArrayList<>();

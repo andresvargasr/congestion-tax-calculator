@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class CongestionTaxCalculator {
 
     private static Map<String, Integer> tollFreeVehicles = new HashMap<>();
-    private static List<TollFeeRule> tollFeeRules = new ArrayList<>();
+    private static List<TollFeeRule> tollFeeRules;
 
     static {
         tollFreeVehicles.put("Motorbike", 0);
@@ -25,7 +25,9 @@ public class CongestionTaxCalculator {
         tollFreeVehicles.put("Diplomat", 3);
         tollFreeVehicles.put("Foreign", 4);
         tollFreeVehicles.put("Military", 5);
-
+        tollFeeRules = TollFeeLoader.loadTollFeeRules();
+        System.out.println("<======> Loaded rules: ");
+        tollFeeRules.stream().forEach(tollFeeRule -> System.out.println("<======> " + tollFeeRule));
     }
     
     public int getTax(Vehicle vehicle, Date[] dates)
@@ -70,9 +72,7 @@ public class CongestionTaxCalculator {
 
         int hour = date.getHours();
         int minute = date.getMinutes();
-        tollFeeRules = TollFeeLoader.loadTollFeeRules();
-        tollFeeRules.stream().forEach(tollFeeRule -> System.out.println(tollFeeRule));
-        return evaluateTollFeeRuleInMemory(hour, minute);
+        return evaluateTollFeeRuleLoaded(hour, minute);
     }
 
     //TODO this methods will replace evaluateTollFeeRuleInMemory
